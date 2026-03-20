@@ -7,7 +7,7 @@ from .kaggle_client import download_dataset
 
 def load_config():
     logging.info("Loading configuration...")
-    config_path = Path(__file__).resolve().parents[0] / "config.yaml"
+    config_path = Path(__file__).resolve().parents[1] / "config.yaml"
     config = read_config(config_path)
     logging.info(f"Configuration loaded: {config}")
     return config
@@ -16,9 +16,9 @@ def load_config():
 def run():
     logging.info("Starting dataset ingestion...")
     config = load_config()
-    raw_path = config.get("raw_path")
-    dataset = config.get("dataset")
-    force_download = config.get("force_download")
+    dataset = config["kaggle"]["dataset"]
+    raw_path = config["paths"]["raw"]
+    force_download = config["kaggle"]["force_download"]
 
     try:
         Path(raw_path).mkdir(parents=True, exist_ok=True)

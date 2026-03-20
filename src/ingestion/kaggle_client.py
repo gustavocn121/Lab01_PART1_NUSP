@@ -1,4 +1,3 @@
-import json
 import os
 from pathlib import Path
 
@@ -13,7 +12,7 @@ def load_kaggle_credentials():
 
     token_str = os.getenv("KAGGLE_API_TOKEN")
     if not token_str:
-        raise ValueError(f"KAGGLE_API_TOKEN not found in {dotenv_path}")
+        raise ValueError(f"KAGGLE_API_TOKEN not found in {dotenv_path}")  # noqa:E713
 
     os.environ["KAGGLE_API_TOKEN"] = token_str
     return token_str

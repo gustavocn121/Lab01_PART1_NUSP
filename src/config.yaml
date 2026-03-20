@@ -1,0 +1,7 @@
+paths:
+  raw: data/raw/
+  silver: data/silver/
+
+kaggle:
+  dataset: sturarods/anac-national-civil-aviation-agency-2000-2025
+  force_download: false
