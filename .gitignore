@@ -1,5 +1,8 @@
 # Byte-compiled / optimized / DLL files
+
 .vscode
+postgres_data
+data
 *.ipynb
 __pycache__/
 *.py[codz]
