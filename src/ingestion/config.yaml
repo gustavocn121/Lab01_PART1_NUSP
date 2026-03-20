@@ -1,2 +1,3 @@
 dataset: "sturarods/anac-national-civil-aviation-agency-2000-2025"
 raw_path: "./data/raw/"
+force_download: false

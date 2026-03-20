@@ -1,7 +1,8 @@
-import os
 import json
-import kagglehub
+import os
 from pathlib import Path
+
+import kagglehub
 from dotenv import load_dotenv
 
 
@@ -17,6 +18,11 @@ def load_kaggle_credentials():
     os.environ["KAGGLE_API_TOKEN"] = token_str
     return token_str
 
-def download_dataset(dataset: str, output_dir: str) -> str:
+
+def download_dataset(
+    dataset: str, output_dir: str, force_download: bool = False
+) -> str:
     load_kaggle_credentials()
-    return kagglehub.dataset_download(dataset, output_dir=output_dir, force_download=True)
+    return kagglehub.dataset_download(
+        dataset, output_dir=output_dir, force_download=force_download
+    )
