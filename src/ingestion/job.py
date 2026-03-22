@@ -1,23 +1,13 @@
 import logging
 from pathlib import Path
 
-from ..utils import read_config
-from .kaggle_client import download_dataset
+from src.ingestion.kaggle_client import download_dataset
 
 
-def load_config():
-    logging.info("Loading configuration...")
-    config_path = Path(__file__).resolve().parents[1] / "config.yaml"
-    config = read_config(config_path)
-    logging.info(f"Configuration loaded: {config}")
-    return config
-
-
-def run():
+def run(config: dict):
     logging.info("Starting dataset ingestion...")
-    config = load_config()
     dataset = config["kaggle"]["dataset"]
-    raw_path = config["paths"]["raw"]
+    raw_path = config["raw"]["path"]
     force_download = config["kaggle"]["force_download"]
 
     try:
