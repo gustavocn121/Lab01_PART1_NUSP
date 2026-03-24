@@ -1,4 +1,5 @@
 # Lab01_PART1_NUSP
+Repo público no github: [link](https://github.com/gustavocn121/Lab01_PART1_NUSP)
 
 ## 1. Arquitetura
 
