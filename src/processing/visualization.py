@@ -31,25 +31,39 @@ def plot_voos_por_empresa(df: pl.LazyFrame, output_path: Path):
 def plot_voos_por_mes(df: pl.LazyFrame, output_path: Path):
     logging.info("Plotting plot_voos_por_mes...")
 
-    data = df.group_by("nr_mes_referencia").len().sort("nr_mes_referencia").collect()
+    data = (
+        df.with_columns(pl.col("nr_mes_referencia").cast(pl.Int32))
+        .group_by("nr_mes_referencia")
+        .len()
+        .sort("nr_mes_referencia")
+        .collect()
+    )
 
-    fig, ax = plt.subplots(figsize=FIG_SIZE)
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(data["nr_mes_referencia"], data["len"])
 
     ax.set_title("Volume de Voos por Mês")
     ax.set_xlabel("Mês")
     ax.set_ylabel("Quantidade de Voos")
-    ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    _save(fig, output_path / "flights_per_month.png")
+    fig.tight_layout()
+    fig.savefig(output_path / "flights_per_month.png")
+    plt.close(fig)
 
 
 def plot_voos_por_ano(df: pl.LazyFrame, output_path: Path):
     logging.info("Plotting plot_voos_por_ano...")
 
-    data = df.group_by("nr_ano_referencia").len().sort("nr_ano_referencia").collect()
+    data = (
+        df.with_columns(pl.col("nr_ano_referencia").cast(pl.Int32))
+        .group_by("nr_ano_referencia")
+        .len()
+        .sort("nr_ano_referencia")
+        .collect()
+    )
 
-    fig, ax = plt.subplots(figsize=FIG_SIZE)
+    fig, ax = plt.subplots(figsize=(10, 6))
+
     ax.bar(data["nr_ano_referencia"], data["len"])
 
     ax.set_title("Volume de Voos por Ano")
@@ -57,7 +71,9 @@ def plot_voos_por_ano(df: pl.LazyFrame, output_path: Path):
     ax.set_ylabel("Quantidade de Voos")
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-    _save(fig, output_path / "flights_per_year.png")
+    fig.tight_layout()
+    fig.savefig(output_path / "flights_per_year.png", dpi=120)
+    plt.close(fig)
 
 
 def plot_top_paises(df: pl.LazyFrame, output_path: Path):
