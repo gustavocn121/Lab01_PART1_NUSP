@@ -97,3 +97,7 @@ pip install -r requirements.txt
 
 python -m src.main
 ```
+3. Métricas de negócio e gráficos
+- Os gráficos gerado estão disponíveis em [`docs/plots`](docs/plots)
+- O arquivo markdown contendo elas está em [`docs/graficos.md`](docs/graficos.md)
+- A query com as métricas de negócio e suas respectivas queries estão disponíveis em [`docs/metricas.md`](docs/metricas.md)
