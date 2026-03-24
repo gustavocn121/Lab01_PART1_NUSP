@@ -8,3 +8,9 @@ kaggle:
   force_download: false
 visualization:
   output_path: docs/plots/
+postgres:
+  host: localhost
+  port: 5432
+  database: lab_01_db
+  user: user
+  password: 123

@@ -13,25 +13,43 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def clean_data(df: pl.LazyFrame) -> pl.LazyFrame:
     logging.info("Cleaning data...")
+
     return (
         df.with_columns(
             pl.col(
                 [
-                    "nr_ano_partida_real",
-                    "nr_semestre_partida_real",
                     "nr_horas_voadas",
                     "nr_velocidade_media",
                     "nr_carga_paga_km",
                     "nr_bagagem_gratis_km",
-                    "nr_trimestre_partida_real",
                     "nr_assentos_ofertados",
-                    "nr_passag_pagos",
-                    "nr_passag_gratis",
-                    "nr_linha",
+                    "kg_payload",
+                    "kg_carga_paga",
+                    "km_distancia",
                 ]
             )
+            .cast(pl.Utf8)
             .str.replace(",", ".")
             .cast(pl.Float32),
+            pl.col("nr_decolagem")
+            .cast(pl.Utf8)
+            .str.replace(",", ".")
+            .cast(pl.Float32)
+            .cast(pl.Int32),
+            pl.col("nr_passag_pagos")
+            .cast(pl.Utf8)
+            .str.replace(",", ".")
+            .cast(pl.Float32)
+            .cast(pl.Int32),
+            pl.col("nr_passag_gratis")
+            .cast(pl.Utf8)
+            .str.replace(",", ".")
+            .cast(pl.Float32)
+            .cast(pl.Int32),
+            pl.col("id_empresa").cast(pl.Int32),
+            pl.col("id_aerodromo_origem").cast(pl.Int32),
+            pl.col("id_aerodromo_destino").cast(pl.Int32),
+            pl.col("dt_referencia").cast(pl.Utf8).str.strptime(pl.Date, strict=False),
             *[
                 pl.col(c).alias(c.replace("nr", "nm"))
                 for c in [
@@ -56,7 +74,7 @@ def export_data(df, output_path, partition_by=None) -> None:
 def run(config: dict):
     logging.info("Starting data processing job...")
     raw_path = config["raw"]["path"]
-    # silver_path = config["silver"]["path"]
+    silver_path = config["silver"]["path"]
 
     df = pl.scan_csv(
         f"{raw_path}/*.csv",
@@ -66,6 +84,6 @@ def run(config: dict):
     ).limit(1000)
 
     df = clean_data(df)
-    # export_data(df, silver_path + "data", partition_by="dt_referencia")
+    export_data(df, silver_path + "data", partition_by="dt_referencia")
     run_report(df, config)
     run_visualization(df, config)

@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:13
+    container_name: lab01_postgres
     environment:
       POSTGRES_DB: lab_01_db
       POSTGRES_USER: user
@@ -9,3 +10,4 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres_data:/volumes/postgres_data
+      - ./sql/ddl.sql:/docker-entrypoint-initdb.d/init.sql
