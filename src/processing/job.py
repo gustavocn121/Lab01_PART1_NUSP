@@ -10,6 +10,8 @@ from src.processing.visualization import run as run_visualization
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 def clean_data(df: pl.LazyFrame) -> pl.LazyFrame:
     logging.info("Cleaning data...")
@@ -30,25 +32,15 @@ def clean_data(df: pl.LazyFrame) -> pl.LazyFrame:
             )
             .cast(pl.Utf8)
             .str.replace(",", ".")
-            .cast(pl.Float32),
+            .cast(pl.Float16),
             pl.col("nr_decolagem")
             .cast(pl.Utf8)
             .str.replace(",", ".")
-            .cast(pl.Float32)
-            .cast(pl.Int32),
-            pl.col("nr_passag_pagos")
-            .cast(pl.Utf8)
-            .str.replace(",", ".")
-            .cast(pl.Float32)
-            .cast(pl.Int32),
-            pl.col("nr_passag_gratis")
-            .cast(pl.Utf8)
-            .str.replace(",", ".")
-            .cast(pl.Float32)
-            .cast(pl.Int32),
+            .cast(pl.Float16)
+            .cast(pl.Int8),
             pl.col("id_empresa").cast(pl.Int32),
-            pl.col("id_aerodromo_origem").cast(pl.Int32),
-            pl.col("id_aerodromo_destino").cast(pl.Int32),
+            pl.col("id_aerodromo_origem").cast(pl.Int16),
+            pl.col("id_aerodromo_destino").cast(pl.Int16),
             pl.col("dt_referencia").cast(pl.Utf8).str.strptime(pl.Date, strict=False),
             *[
                 pl.col(c).alias(c.replace("nr", "nm"))
@@ -81,8 +73,8 @@ def run(config: dict):
         dtypes=SCHEMA,
         infer_schema_length=0,
         ignore_errors=False,
-    ).limit(1000)
-
+        low_memory=True,
+    )
     df = clean_data(df)
     export_data(df, silver_path + "data", partition_by="dt_referencia")
     run_report(df, config)
