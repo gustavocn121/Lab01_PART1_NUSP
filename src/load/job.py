@@ -13,6 +13,7 @@ def get_db_connection(host: str, database: str, user: str, password: str, port: 
 
 
 def copy_lazyframe(cursor, lazy_df: pl.LazyFrame, table: str, columns: list[str]):
+
     buffer = io.StringIO()
 
     lazy_df.collect(streaming=True).write_csv(buffer, include_header=True)
@@ -20,7 +21,6 @@ def copy_lazyframe(cursor, lazy_df: pl.LazyFrame, table: str, columns: list[str]
     buffer.seek(0)
 
     cols = ",".join(columns)
-    cursor.execute(f"TRUNCATE TABLE {table}")
     cursor.copy_expert(f"COPY {table} ({cols}) FROM STDIN WITH CSV HEADER", buffer)
 
 
@@ -49,7 +49,7 @@ def load_dim_empresa(df_lazy, cursor):
             pl.col("sg_empresa_iata").alias("sigla_iata"),
             pl.col("nm_pais").alias("pais"),
         ]
-    ).unique()
+    ).unique(subset=["empresa_id"])
 
     copy_lazyframe(
         cursor, query, "dim_empresa", ["empresa_id", "nome_empresa", "sigla_iata", "pais"]
@@ -79,7 +79,8 @@ def load_dim_aeroporto(df_lazy, cursor):
         ]
     )
 
-    query = pl.concat([origem, destino]).unique()
+    query = pl.concat([origem, destino])
+    query = query.filter(pl.col("aeroporto_id") != 0).unique(subset=["aeroporto_id"])
 
     copy_lazyframe(
         cursor, query, "dim_aeroporto", ["aeroporto_id", "nome", "cidade", "estado", "regiao"]
@@ -91,33 +92,29 @@ def load_fato_voos(df_lazy, cursor):
 
     dim_data = pl.read_database("SELECT data_id, data FROM dim_data", cursor.connection).lazy()
 
-    query = df_lazy.join(dim_data, left_on="dt_referencia", right_on="data", how="left").select(
-        [
-            "data_id",
-            pl.col("id_empresa").alias("empresa_id"),
-            pl.col("id_aerodromo_origem").alias("aeroporto_origem_id"),
-            pl.col("id_aerodromo_destino").alias("aeroporto_destino_id"),
-            pl.col("nr_decolagem").alias("quantidade_voos"),
-            pl.col("nr_passag_pagos").alias("passageiros"),
-            pl.col("kg_carga_paga").alias("carga_kg"),
-            pl.lit(None).alias("receita"),
-        ]
-    )
-
-    copy_lazyframe(
-        cursor,
-        query,
-        "fato_voos",
-        [
-            "data_id",
-            "empresa_id",
-            "aeroporto_origem_id",
-            "aeroporto_destino_id",
-            "quantidade_voos",
-            "passageiros",
-            "carga_kg",
-            "receita",
-        ],
+    query = (
+        df_lazy.join(dim_data, left_on="dt_referencia", right_on="data", how="left")
+        .select(
+            [
+                "data_id",
+                pl.col("id_empresa").alias("empresa_id"),
+                pl.col("id_aerodromo_origem").alias("aeroporto_origem_id"),
+                pl.col("id_aerodromo_destino").alias("aeroporto_destino_id"),
+                pl.col("nr_decolagem").alias("quantidade_voos"),
+                pl.col("nr_passag_pagos").cast(pl.Float16).cast(pl.Int16).alias("passageiros"),
+                pl.col("kg_carga_paga").alias("carga_kg"),
+                pl.lit(None).alias("receita"),
+            ]
+        )
+        .unique(
+            subset=[
+                "data_id",
+                "empresa_id",
+                "aeroporto_origem_id",
+                "aeroporto_destino_id",
+            ],
+            maintain_order=False,
+        )
     )
 
     copy_lazyframe(

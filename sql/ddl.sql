@@ -29,6 +29,6 @@ CREATE TABLE fato_voos (
     aeroporto_destino_id INT,
     quantidade_voos INT,
     passageiros INT,
-    carga_kg NUMERIC,
+    carga_kg TEXT,
     receita NUMERIC
 );
