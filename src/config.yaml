@@ -1,10 +1,10 @@
 ---
-raw: 
+raw:
   path: data/raw/
-silver: 
+silver:
   path: data/silver/
-  filename: processed_data.parquet
 kaggle:
   dataset: sturarods/anac-national-civil-aviation-agency-2000-2025
   force_download: false
-
+visualization:
+  output_path: docs/plots/

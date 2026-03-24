@@ -1,2 +1,5 @@
 python-dotenv
+kagglehub
 kagglehub[polars-datasets]
+pyarrow
+deltalake

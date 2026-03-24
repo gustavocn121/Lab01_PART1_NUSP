@@ -12,14 +12,8 @@ def run(config: dict):
 
     try:
         Path(raw_path).mkdir(parents=True, exist_ok=True)
-        dataset_path = download_dataset(
-            dataset, output_dir=raw_path, force_download=force_download
-        )
-        logging.info(f"Downloaded dataset to: {dataset_path}")
+        dataset_path = download_dataset(dataset, output_dir=raw_path, force_download=force_download)
+        logging.info(f"Downloaded dataset to: `{dataset_path}`")
     except Exception as e:
         logging.error(f"Ingestion failed: {e}")
         raise
-
-
-if __name__ == "__main__":
-    run()
